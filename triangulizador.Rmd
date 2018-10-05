@@ -1,0 +1,74 @@
+---
+title: "Triangulizador"
+author: "Galileo Cappella"
+date: "September 27, 2018"
+output: html_document
+---
+
+```{r}
+MI <- matrix( #Matriz de identidad
+  c(1, 0, 0, 0,
+    0, 1, 0, 0,
+    0, 0, 1, 0,
+    0, 0, 0, 1),
+  nrow = 4,
+  ncol = 4,
+  byrow = TRUE
+)
+
+MTestGen <- matrix( #Una para testear en general
+  c(3, 9, 3, 12,
+    5, 1, 4, 6,
+    0, 3, 5, 10,
+    8, 0, 1, 1),
+  nrow = 4,
+  ncol = 4,
+  byrow = TRUE
+)
+
+MTestOrd <- matrix( #Para testear el orden
+  c(1, 1, 1, 1,
+    2, 2, 2, 2,
+    3, 3, 3, 3,
+    4, 4, 4, 4),
+  nrow = 4,
+  ncol = 4,
+  byrow = TRUE
+)
+```
+
+```{r}
+triangular <- function(mat) {
+
+  for(i in 1:NROW(mat)){
+  #Si llegara a tener un 0 arriba de todo me va a molestar. Por lo qe primero ordeno la matriz para asegurarme un numero > 0. Y lo repito por cada columna (bajando por la diagonal)
+    correctOrder <- order(mat[i:NROW(mat),i], decreasing = TRUE) #Averigua el orden correcto para la columna qe esta
+        
+    TempMat <- mat[correctOrder,i:NCOL(mat)] #Reorganiza las columnas y las mete en una matrix temporal, en la qe ignora los valores qe ya corrigio
+    
+    TempMat[1,] <- TempMat[1,] / TempMat[1,1] #Normalizo la fila (si ya valia 1, no va a afectarme)
+    
+    for(t in 2:NROW(mat)) { #Qiero qe reste a las filas de la columna para volverlas cero.
+        TempMat[t,] <- TempMat[t,] - TempMat[1,1] * TempMat[t,i]
+        #Para debug:
+        print("t")
+        print(t)
+        #PROBLEMA: Por alguna razon, cuando llega al t
+    }
+    
+    #Para ir debugeando:
+    print("Sigiente, i")
+    print(i)
+    print("Orden")
+    print(correctOrder)
+    print("Matriz:")
+    print(TempMat)
+    print("DIM")
+    print(dim(TempMat))
+  }
+
+ return(TempMat)
+}
+
+triangular(MTestGen)
+```
