@@ -25,55 +25,42 @@ MTestGen <- matrix( #Una para testear en general
   ncol = 4,
   byrow = TRUE
 )
-
-MTestOrd <- matrix( #Para testear el orden
-  c(1, 1, 1, 1,
-    2, 2, 2, 2,
-    3, 3, 3, 3,
-    4, 4, 4, 4),
-  nrow = 4,
-  ncol = 4,
-  byrow = TRUE
-)
 ```
 
 ```{r}
 #TODOS LOS PRINT ESTAN PARA DEBUGEAR
 
 triangular <- function(mat) {
-  
-  correctOrder <- order(mat[1:NROW(mat),1], decreasing = TRUE)
-        
-  mat <- mat[correctOrder,1:NCOL(mat)] #Copiado de mas tarde
+    print("Matriz inicial")
+    print(mat)
 
   for(i in 1:NROW(mat)){
     print("i Nro")
     print(i)
 
-  #Si llegara a tener un 0 arriba de todo me va a molestar. Por lo qe primero ordeno la matriz para asegurarme un numero > 0. Y lo repito por cada columna (bajando por la diagonal)
-    correctOrder <- order(mat[i:NROW(mat),i], decreasing = TRUE) #Averigua el orden correcto para la columna qe esta
-    print("Orden")
-    print(correctOrder)
+    Order <- order(mat[i:NROW(mat),i], decreasing = TRUE) #Averigua el orden correcto para la columna qe esta, asegurandose de qe no haya un 0 arriba de todo
+    print("Order")
+    print(Order)
 
-    mat[i:NROW(mat),i:NCOL(mat)] <- mat[correctOrder,i:NCOL(mat)] #Reorganiza las columnas y las mete en una matrix temporal, en la qe ignora los valores qe ya corrigio
+    mat[i:NROW(mat),i:NCOL(mat)] <- mat[Order,i:NCOL(mat)] #Reorganiza las filas ignorando las filas qe ya arreglo
+    #PROBLEMA: De la segunda pasada en adelante, cuando le doy el orden le estoy diciendo (en base a los valores para el orden qe qeda despues de la primera pasada usando MTestGen): "A la [2,] reemplazala con [2,], a la [3,] con [3,] y a la [4,] con [1,]". PORQE ESE ES EL ORDEN DE LAS TRES FILAS QE LE PEDI QE ORGANIZE, TENDRIA QE QEDAR: "A la [2,] reemplazala con [3,], a la [3,] con [4,] y a la [4,] con [2,]"
     
-    #Me gustaria meter al organizador en una funcion aparte, para no haber hecho el copy paste de antes
-    print("Matriz:")
+    print("Matrix:")
     print(mat)
     print("DIM")
     print(dim(mat))
     
-    mat[1,] <- mat[1,] / mat[1,1] #Normalizo la fila (si ya valia 1, no va a afectarme)
+    mat[1,] <- mat[1,] / mat[1,1] #Normalizo la fila
     print("Normalizada:")
     print(mat)
     
-    for(t in 2:NROW(mat)) { #Qiero qe reste a las filas de la columna para volverlas cero.
+    for(t in 2:NROW(mat)) { #Qiero qe reste a las filas de la columna para volver cero a esta columna (excepto por el primer valor).
         print("t")
         print(t)
         print("tAnt")
         print(mat[t,])
         
-        mat[t,] <- mat[t,] - mat[t,1] #A toda la fila le resta el primer valor
+        mat[t,] <- mat[t,] - mat[t,i] #A toda la fila le resta el primer valor
         
         print("tNew")
         print(mat[t,])
