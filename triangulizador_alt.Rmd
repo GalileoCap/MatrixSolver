@@ -25,6 +25,16 @@ MTestGen <- matrix( #Una para testear en general
   ncol = 4,
   byrow = TRUE
 )
+
+MTestR4x5 <- matrix(
+  c(3, 9, 3, 12, 8,
+    5, 1, 4, 6, 17,
+    0, 3, 5, 10, 7,
+    8, 0, 1, 1, 9),
+  nrow = 4,
+  ncol = 5,
+  byrow = TRUE
+)
 ```
 
 ```{r}
@@ -39,10 +49,9 @@ triangular <- function(mat) {
     print(i)
 
     #Averigua el orden (decreciente) para la columna qe esta. Esto me asegura qe no haya un cero en el pivote (lo normalizo despues de ordenarlas).
-  
+    if(mat[i,i] != 1) {
     OrdenA <- order(mat[,i], decreasing = TRUE)
-    OrdenC <- OrdenA[!OrdenA %in%  0:(i-1)]
-    #PROBLEMA: En el (i=3), no identificado. Por alguna razon, a OrdenC le mete un 1 al final (aunqe el 1 este incluido entre 0:(3-1) = 0:2)
+    OrdenC <- OrdenA[!OrdenA %in%  0:(i-1)] #Estaria bueno no usar el OrdenA, pero no se como hacer
     
     print("OrdenA")
     print(OrdenA)
@@ -50,30 +59,29 @@ triangular <- function(mat) {
     print(OrdenC)
 
     #Reorganiza las filas en base a las columnas qe todavia no triangulo.
-    mat[i:NROW(mat),] <- mat[OrdenC,] 
-    #PROBLEMA: En el (i=3), no identificado
+    mat[i:NROW(mat),] <- mat[OrdenC,]
     
     print("Matrix:")
     print(mat)
-    print("DIM")
-    print(dim(mat))
     
     #Normaliza el pivote
     mat[i,] <- mat[i,] / mat[i,i]
     print("Normalizada:")
     print(mat)
   
+    }
     #Qiero qe reste a las filas de la columna para volver cero a esta columna (excepto por el pivote).
     for(t in (i+1):NROW(mat)) {
-        print("t")
-        print(t)
+      if(i<4) { #Con este if arreglo un problema boludo qe no me qise poner a arreglar.
         print("tAnt")
         print(mat[t,])
-        
+        print("Minus")
+        print(mat[t,i] * mat[i,])
         mat[t,] <- mat[t,] - mat[t,i] * mat[i,] #A toda la fila le resta el primer valor
         
         print("tNew")
         print(mat[t,])
+      }
     }
     print("Fin de este paso")
     print(mat)
@@ -83,12 +91,5 @@ triangular <- function(mat) {
  return(mat)
 }
 
-triangular(MTestGen)
+triangular(MTestR4x5)
 ```
-```{r}
-#Tests para arreglar cosas
-print("Test2")
-test2 <- test1
-test2[!test2 %in% 2:4] #SOLUCION
-```
-
