@@ -37,13 +37,13 @@ triangular <- function(mat) {
   for(i in 1:NROW(mat)){
     print("i Nro")
     print(i)
-
+    
     Order <- order(mat[i:NROW(mat),i], decreasing = TRUE) #Averigua el orden correcto para la columna qe esta, asegurandose de qe no haya un 0 arriba de todo
     print("Order")
     print(Order)
 
     mat[i:NROW(mat),i:NCOL(mat)] <- mat[Order,i:NCOL(mat)] #Reorganiza las filas ignorando las filas qe ya arreglo
-    #PROBLEMA: De la segunda pasada en adelante, cuando le doy el orden le estoy diciendo (en base a los valores para el orden qe qeda despues de la primera pasada usando MTestGen): "A la [2,] reemplazala con [2,], a la [3,] con [3,] y a la [4,] con [1,]". PORQE ESE ES EL ORDEN DE LAS TRES FILAS QE LE PEDI QE ORGANIZE, TENDRIA QE QEDAR: "A la [2,] reemplazala con [3,], a la [3,] con [4,] y a la [4,] con [2,]"
+    #PROBLEMA: De la segunda pasada en adelante, cuando le doy el orden le estoy diciendo (en base a los valores para el orden qe qeda despues de la primera pasada usando MTestGen): "A la [2,] reemplazala con [2,], a la [3,] con [3,] y a la [4,] con [1,]". PORQE ESE ES EL ORDEN DE LAS TRES FILAS QE LE PEDI QE ORGANIZE, TENDRIA QE QEDAR: "A la [2,] reemplazala con [3,], a la [3,] con [4,] y a la [4,] con [2,]". Para entender mejor, revisar: "Fin de este paso" (i = 1);  "Order" (i = 2); "Matrix" (i = 2).
     
     print("Matrix:")
     print(mat)
@@ -75,3 +75,13 @@ triangular <- function(mat) {
 
 triangular(MTestGen)
 ```
+```{r}
+#Tendra futuro para arreglar el problema del orden?
+test <- c(5, 4, 2, 3) #Le pongo valores cualqiera
+
+print(test)
+print(test[2:4])
+print(order(test))
+print(order(test[2:4]))
+```
+
