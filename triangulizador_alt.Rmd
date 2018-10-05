@@ -39,14 +39,18 @@ triangular <- function(mat) {
     print(i)
 
     #Averigua el orden (decreciente) para la columna qe esta. Esto me asegura qe no haya un cero en el pivote (lo normalizo despues de ordenarlas).
-    Order <- order(mat[i:NROW(mat),i], decreasing = TRUE)
-    
-    print("Order")
-    print(Order)
+    if(i==1) {
+        OrdenC <- order(mat[i:NROW(mat),i], decreasing = TRUE)
+    } else {
+        OrdenA <- order(mat[,i], decreasing = TRUE)
+        OrdenC <- OrdenA[OrdenA !=  1:(i-1)]
+    }
+    print("OrdenC")
+    print(OrdenC)
 
     #Reorganiza las filas en base a las columnas qe todavia no triangulo.
-    mat[i:NROW(mat),] <- mat[Order,] 
-    #PROBLEMA: De la segunda pasada en adelante, cuando le doy el orden le estoy diciendo (en base a los valores para el orden qe qeda despues de la primera pasada usando MTestGen): "A la [2,] reemplazala con [2,], a la [3,] con [3,] y a la [4,] con [1,]". PORQE ESE ES EL ORDEN DE LAS TRES FILAS QE LE PEDI QE ORGANIZE, TENDRIA QE QEDAR: "A la [2,] reemplazala con [3,], a la [3,] con [4,] y a la [4,] con [2,]". Para entender mejor, revisar: "Fin de este paso" (i = 1);  "Order" (i = 2); "Matrix" (i = 2).
+    mat[i:NROW(mat),] <- mat[OrdenC,] 
+    #PROBLEMA: De la segunda pasada en adelante, cuando le doy el orden le estoy diciendo (en base a los valores para el orden qe qeda despues de la primera pasada usando MTestGen): "A la [2,] reemplazala con [2,], a la [3,] con [3,] y a la [4,] con [1,]". PORQE ESE ES EL ORDEN DE LAS TRES FILAS QE LE PEDI QE ORGANIZE, TENDRIA QE QEDAR: "A la [2,] reemplazala con [3,], a la [3,] con [4,] y a la [4,] con [2,]". Para entender mejor, revisar: "Fin de este paso" (i = 1);  "OrdenC" (i = 2); "Matrix" (i = 2).
     
     print("Matrix:")
     print(mat)
@@ -59,13 +63,13 @@ triangular <- function(mat) {
     print(mat)
   
     #Qiero qe reste a las filas de la columna para volver cero a esta columna (excepto por el pivote).
-    for(t in 2:NROW(mat)) {
+    for(t in (i+1):NROW(mat)) {
         print("t")
         print(t)
         print("tAnt")
         print(mat[t,])
         
-        mat[t,] <- mat[t,] - mat[t,i] #A toda la fila le resta el primer valor
+        mat[t,] <- mat[t,] - mat[t,i] * mat[i,] #A toda la fila le resta el primer valor
         
         print("tNew")
         print(mat[t,])
