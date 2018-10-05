@@ -85,8 +85,6 @@ triangular(MTestGen)
 test <- c(5, 4, 2, 3) #Le pongo valores cualqiera
 
 print(test)
-print(test[2:4])
-print(order(test))
-print(order(test[2:4]))
+print(test[test != 4]) #Me deshago de los valores qe valen 4
 ```
 
