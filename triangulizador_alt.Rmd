@@ -1,0 +1,90 @@
+---
+title: "Triangulizador"
+author: "Galileo Cappella"
+date: "September 27, 2018"
+output: html_document
+---
+
+```{r}
+MI <- matrix( #Matriz de identidad
+  c(1, 0, 0, 0,
+    0, 1, 0, 0,
+    0, 0, 1, 0,
+    0, 0, 0, 1),
+  nrow = 4,
+  ncol = 4,
+  byrow = TRUE
+)
+
+MTestGen <- matrix( #Una para testear en general
+  c(3, 9, 3, 12,
+    5, 1, 4, 6,
+    0, 3, 5, 10,
+    8, 0, 1, 1),
+  nrow = 4,
+  ncol = 4,
+  byrow = TRUE
+)
+
+MTestOrd <- matrix( #Para testear el orden
+  c(1, 1, 1, 1,
+    2, 2, 2, 2,
+    3, 3, 3, 3,
+    4, 4, 4, 4),
+  nrow = 4,
+  ncol = 4,
+  byrow = TRUE
+)
+```
+
+```{r}
+#TODOS LOS PRINT ESTAN PARA DEBUGEAR
+
+triangular <- function(mat) {
+  
+  correctOrder <- order(mat[1:NROW(mat),1], decreasing = TRUE)
+        
+  mat <- mat[correctOrder,1:NCOL(mat)] #Copiado de mas tarde
+
+  for(i in 1:NROW(mat)){
+    print("i Nro")
+    print(i)
+
+  #Si llegara a tener un 0 arriba de todo me va a molestar. Por lo qe primero ordeno la matriz para asegurarme un numero > 0. Y lo repito por cada columna (bajando por la diagonal)
+    correctOrder <- order(mat[i:NROW(mat),i], decreasing = TRUE) #Averigua el orden correcto para la columna qe esta
+    print("Orden")
+    print(correctOrder)
+
+    mat[i:NROW(mat),i:NCOL(mat)] <- mat[correctOrder,i:NCOL(mat)] #Reorganiza las columnas y las mete en una matrix temporal, en la qe ignora los valores qe ya corrigio
+    
+    #Me gustaria meter al organizador en una funcion aparte, para no haber hecho el copy paste de antes
+    print("Matriz:")
+    print(mat)
+    print("DIM")
+    print(dim(mat))
+    
+    mat[1,] <- mat[1,] / mat[1,1] #Normalizo la fila (si ya valia 1, no va a afectarme)
+    print("Normalizada:")
+    print(mat)
+    
+    for(t in 2:NROW(mat)) { #Qiero qe reste a las filas de la columna para volverlas cero.
+        print("t")
+        print(t)
+        print("tAnt")
+        print(mat[t,])
+        
+        mat[t,] <- mat[t,] - mat[t,1] #A toda la fila le resta el primer valor
+        
+        print("tNew")
+        print(mat[t,])
+    }
+    print("Fin de este paso")
+    print(mat)
+  }
+
+ print("Done")
+ return(mat)
+}
+
+triangular(MTestGen)
+```
