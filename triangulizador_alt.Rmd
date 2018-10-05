@@ -41,7 +41,7 @@ triangular <- function(mat) {
     #Averigua el orden (decreciente) para la columna qe esta. Esto me asegura qe no haya un cero en el pivote (lo normalizo despues de ordenarlas).
   
     OrdenA <- order(mat[,i], decreasing = TRUE)
-    OrdenC <- OrdenA[OrdenA !=  0:(i-1)]
+    OrdenC <- OrdenA[!OrdenA %in%  0:(i-1)]
     #PROBLEMA: En el (i=3), no identificado. Por alguna razon, a OrdenC le mete un 1 al final (aunqe el 1 este incluido entre 0:(3-1) = 0:2)
     
     print("OrdenA")
@@ -87,17 +87,6 @@ triangular(MTestGen)
 ```
 ```{r}
 #Tests para arreglar cosas
-print("Tests de como funciona el !=")
-1 != 2
-2 != 2
-2 != 1:3
-
-print("Test")
-test1 <- c(1, 2, 3, 4, 5)
-test1
-test1[test1 != 2] #Se deshace sin problema del dos
-test1[test1 != 2:4] #Me muestra todo
-
 print("Test2")
 test2 <- test1
 test2[!test2 %in% 2:4] #SOLUCION
