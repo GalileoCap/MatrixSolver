@@ -38,35 +38,51 @@ MTestOrd <- matrix( #Para testear el orden
 ```
 
 ```{r}
+#TODOS LOS PRINT ESTAN PARA DEBUGEAR
+
 triangular <- function(mat) {
+  
+  correctOrder <- order(mat[1:NROW(mat),1], decreasing = TRUE)
+        
+  TempMat <- mat[correctOrder,1:NCOL(mat)] #Copiado de mas tarde
 
   for(i in 1:NROW(mat)){
-  #Si llegara a tener un 0 arriba de todo me va a molestar. Por lo qe primero ordeno la matriz para asegurarme un numero > 0. Y lo repito por cada columna (bajando por la diagonal)
-    correctOrder <- order(mat[i:NROW(mat),i], decreasing = TRUE) #Averigua el orden correcto para la columna qe esta
-        
-    TempMat <- mat[correctOrder,i:NCOL(mat)] #Reorganiza las columnas y las mete en una matrix temporal, en la qe ignora los valores qe ya corrigio
-    
-    TempMat[1,] <- TempMat[1,] / TempMat[1,1] #Normalizo la fila (si ya valia 1, no va a afectarme)
-    
-    for(t in 2:NROW(mat)) { #Qiero qe reste a las filas de la columna para volverlas cero.
-        TempMat[t,] <- TempMat[t,] - TempMat[1,1] * TempMat[t,i]
-        #Para debug:
-        print("t")
-        print(t)
-        #PROBLEMA: Por alguna razon, cuando llega al t
-    }
-    
-    #Para ir debugeando:
-    print("Sigiente, i")
+    print("i Nro")
     print(i)
+
+  #Si llegara a tener un 0 arriba de todo me va a molestar. Por lo qe primero ordeno la matriz para asegurarme un numero > 0. Y lo repito por cada columna (bajando por la diagonal)
+    correctOrder <- order(TempMat[i:NROW(TempMat),i], decreasing = TRUE) #Averigua el orden correcto para la columna qe esta
     print("Orden")
     print(correctOrder)
+
+    TempMat <- TempMat[correctOrder,i:NCOL(TempMat)] #Reorganiza las columnas y las mete en una matrix temporal, en la qe ignora los valores qe ya corrigio
+    
+    #Me gustaria meter al organizador en una funcion aparte, para no haber hecho el copy paste de antes
     print("Matriz:")
     print(TempMat)
     print("DIM")
     print(dim(TempMat))
+    
+    TempMat[1,] <- TempMat[1,] / TempMat[1,1] #Normalizo la fila (si ya valia 1, no va a afectarme)
+    print("Normalizada:")
+    print(TempMat)
+    
+    for(t in 2:NROW(TempMat)) { #Qiero qe reste a las filas de la columna para volverlas cero.
+        print("t")
+        print(t)
+        print("tAnt")
+        print(TempMat[t,])
+        
+        TempMat[t,] <- TempMat[t,] - TempMat[t,1] #A toda la fila le resta el primer valor
+        
+        print("tNew")
+        print(TempMat[t,])
+    }
+    print("Fin de este paso")
+    print(TempMat)
   }
 
+ print("Done")
  return(TempMat)
 }
 
