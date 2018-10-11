@@ -4,8 +4,12 @@ author: "Galileo Cappella"
 date: "September 27, 2018"
 output: html_document
 ---
-
 ```{r}
+#PrinteaParaDebugear
+DBG <- function(cartel, valor) {
+  print(cartel); print(valor)
+}
+
 MI <- matrix( #Matriz de identidad
   c(1, 0, 0, 0,
     0, 1, 0, 0,
@@ -16,80 +20,199 @@ MI <- matrix( #Matriz de identidad
   byrow = TRUE
 )
 
-MTestGen <- matrix( #Una para testear en general
-  c(3, 9, 3, 12,
-    5, 1, 4, 6,
-    0, 3, 5, 10,
-    8, 0, 1, 1),
-  nrow = 4,
-  ncol = 4,
-  byrow = TRUE
-)
-
-MTestR4x5 <- matrix(
-  c(3, 9, 3, 12, 8,
-    5, 1, 4, 6, 17,
-    0, 3, 5, 10, 7,
-    8, 0, 1, 1, 9),
-  nrow = 4,
-  ncol = 5,
-  byrow = TRUE
-)
-```
-
-```{r}
-#TODOS LOS PRINT ESTAN PARA DEBUGEAR
-
-triangular <- function(mat) {
-    print("Matriz inicial")
-    print(mat)
-
-  for(i in 1:NROW(mat)){
-    print("i Nro")
-    print(i)
-
-    #Averigua el orden (decreciente) para la columna qe esta. Esto me asegura qe no haya un cero en el pivote (lo normalizo despues de ordenarlas).
-    if(mat[i,i] != 1) {
-    OrdenA <- order(mat[,i], decreasing = TRUE)
-    OrdenC <- OrdenA[!OrdenA %in%  0:(i-1)] #Estaria bueno no usar el OrdenA, pero no se como hacer
-    
-    print("OrdenA")
-    print(OrdenA)
-    print("OrdenC")
-    print(OrdenC)
-
-    #Reorganiza las filas en base a las columnas qe todavia no triangulo.
-    mat[i:NROW(mat),] <- mat[OrdenC,]
-    
-    print("Matrix:")
-    print(mat)
-    
-    #Normaliza el pivote
-    mat[i,] <- mat[i,] / mat[i,i]
-    print("Normalizada:")
-    print(mat)
-  
-    }
-    #Qiero qe reste a las filas de la columna para volver cero a esta columna (excepto por el pivote).
-    for(t in (i+1):NROW(mat)) {
-      if(i<4) { #Con este if arreglo un problema boludo qe no me qise poner a arreglar.
-        print("tAnt")
-        print(mat[t,])
-        print("Minus")
-        print(mat[t,i] * mat[i,])
-        mat[t,] <- mat[t,] - mat[t,i] * mat[i,] #A toda la fila le resta el primer valor
-        
-        print("tNew")
-        print(mat[t,])
-      }
-    }
-    print("Fin de este paso")
-    print(mat)
-  }
-
- print("Done")
- return(mat)
+matrizEcuaciones <- function(valores) { #U: Matriz con una columna mas qe filas
+  cantFilas <- (-1+sqrt(1+4*length(valores)))/2 #A: length(valores) = f*c = f*(f+1)
+  matrix(
+      valores,
+      ncol = cantFilas+1,
+      nrow = cantFilas,
+      byrow = TRUE
+  )
 }
 
-triangular(MTestR4x5)
+testMatrizEcuaciones <- function() {
+  matrizEcuaciones(c(1, 2, 3, 4, 5, 6)) == matrix(
+    c(1, 2, 3,
+      4, 5, 6),
+    ncol = 3,
+    nrow = 2,
+    byrow = TRUE
+  )
+}
+
+TestMatriz1a6 <- matrizEcuaciones(c(1, 2, 3, 4, 5, 6))
+
+MTest <- matrizEcuaciones(c(1, 2, 3, -1, 1, 2, 2, 2, -3, 2, 1, -1, 0, 4, -1, -1, 1, -3, 3, 0)) #Matriz sacada del ejercicio 4)a), Practica 2
+
+MTestTrivial <- matrizEcuaciones(c(1, 0, 0, 10, 0, 1, 0, 20, 0, 0, 1, 30))
+
+MTestPivot <- matrizEcuaciones(c(2, 0, 0, 10, 0, 3, 0, 20, 0, 0, 4, 30))
+
+MTestDosVars <- matrizEcuaciones(c(1, 0, 1, 40, 0, 1, 0, 20, 0, 0, 1, 30))
+
+MTestDosVarsYPivot <- matrizEcuaciones(c(2, 0, 1, 27.5, 0, 3, 0, 20, 0, 0, 4, 30))
+##########################################################################
+
+ordenarPendientes <- function(mat, columna) {
+  #Averigua el orden (decreciente) para la columna qe esta. Esto me asegura qe no haya un cero en el pivote (lo normalizo despues de ordenarlas).
+
+  OrdenA <- order(mat[,columna], decreasing = TRUE)
+  #A: Filas ordenadas por el valor de la columna i de mayor a menor
+  OrdenC <- OrdenA[!OrdenA %in%  0:(columna-1)] #XXX: Estaria bueno no usar el OrdenA, pero no se como hacer
+  #A: OrdenC tiene solo los indices de las filas qe todavia no ordene
+  
+  DBG("OrdenA", OrdenA)
+  DBG("OrdenC", OrdenC)
+
+  #Reorganiza las filas en base a las columnas qe todavia no triangulo.
+  mat[columna:NROW(mat),] <- mat[OrdenC,]
+  
+  DBG("Matrix", mat)
+  return(mat)
+}
+
+testOrdenar <- function() {
+  ordenarPendientes(TestMatriz1a6, 3)
+}
+
+restarFila <- function(filaDestino, filaQeResto, columna) {
+  DBG("filaDestino antes", filaDestino)
+  DBG("Lo qe resto", filaDestino[columna] * filaQeResto)
+  
+  filaDestino <- filaDestino - filaDestino[columna] * filaQeResto
+  
+  DBG("filaDestino despues", filaDestino)
+  return(filaDestino)
+}
+
+testRestarFila1 <- function() {
+  res <- restarFila(c(0, 0, 0, 1), c(1, 0, 0, 0), 4)
+  res == c(0, 0, 0, 1) #A: La tiene qe dejar igual
+}
+
+procesarUna <- function(mat, i) {
+  DBG("iNro", i)
+    
+  mat <- ordenarPendientes(mat, i)
+  
+  mat[i,] <- mat[i,] / mat[i,i]
+  DBG(paste("Normalize el pivote fila", i), mat[i,])
+  
+  #Qiero qe reste a las filas de la columna para volver cero a esta columna (excepto por el pivote).
+  if(i != NROW(mat)) { #A: A la ultima fila no voy a hacerle nada
+    for(t in (i+1):NROW(mat)) {
+      mat[t,] <- restarFila(mat[t,], mat[i,], i)
+    }
+  }
+
+  DBG("Fin de este paso", mat)
+  return(mat)
+}
+
+revisarCeros <- function(mat) { #A: Se deshace de las filas de ceros
+  
+  for(i in 1:NROW(mat)){
+    vale <- 0
+    for(t in 1:NCOL(mat)){
+      if(mat[i,][t] != 0){
+        vale <- 1
+      }
+    }
+    if(vale == 0){
+      mat <- mat[-i,]
+    }
+  }
+
+  return(mat)
+}
+
+testRevisarCeros <- function(){
+  TestConFilaCeros <- matrizEcuaciones(c(1, 2, 0, 0, 0 ,0))
+  revisarCeros(TestConFilaCeros) == c(1, 2, 0)
+}
+
+averiguarX <- function(fila, averiguo) { #A: Averigua el valor de la solucion para cada fila.
+  largo <- length(fila)
+
+  todoOtro <- do.call(sum, as.list(fila[c(-averiguo, -largo)])) #A: Suma todos los valores excepto el qe qiero averiguar y el de la ampliacion.
+
+  x <- (fila[largo] - todoOtro)/fila[averiguo]
+  
+  return(x)
+}
+
+testAveriguarX1 <- function() {
+  test <- c(2, 0, 0, 18)
+  averiguarX(test, 1) == 9
+}
+
+testAveriguarX2 <- function() {
+  test <- c(0, 4, 10, 18)
+  averiguarX(test, 2) == 2
+}
+
+resolverMatriz <- function(mat) { #A: Averigua la solucion del sistema
+  revisarCeros(mat)
+  
+  if(NCOL(mat) > NROW(mat)) {
+    if(NCOL(mat) == (NROW(mat)+1)) { #A: Revisa qe la matriz este ampliada
+      print("El sistema tiene solucion trivial, qe es:")
+      
+      solucion <- rep(0, NROW(mat))
+  
+      for(i in NROW(mat):1) {
+        solucion[i] <- averiguarX(mat[i,], i)
+        mat[,i] <- mat[,i] * solucion[i] #A: Multiplica los valores de la columna cuyo multiplicador ya averigue (ej: Si en el primer paso averigua el valor de "z", entonces se asegura qe en las otras filas ya se haya multiplicado la 3ra columna por ese)
+      }
+      
+      DBG("Solucion", solucion)
+      return(solucion)
+    } else {
+        #XXX: Agregar qe averigue el hiperespacio al cual pertenecen las soluciones
+        print("El sistema tiene solucion no trivial")
+    }
+  } else {
+    print("El sistema no esta ampliado")
+  }
+}
+
+testResolverMatriz1 <- function() { #Pruebo con una matriz simple cuya solucion es (4, 4, 4)
+  test <- matrizEcuaciones(c(1, 0, 0, 4, 0, 1, 0, 4, 0, 0, 1, 4))
+  resolverMatriz(test) == c(4, 4, 4)
+}
+
+testResolverMatriz2 <- function() { #Esta matriz tiene qe tener solucion no trivial
+  test <- matrix(
+    c(1, 0, 0, 0,
+      0 ,1, 0, 0),
+    nrow = 2,
+    ncol = 4,
+    byrow = TRUE
+  )
+  resolverMatriz(test)
+}
+
+testResolverMatriz3 <- function() { #Esta matriz no esta ampliada
+  test <- matrix(
+    c(1, 0,
+      0, 1),
+    nrow = 2,
+    ncol = 2,
+    byrow = TRUE
+  )
+  resolverMatriz(test)
+}
+
+triangular <- function(mat) {
+  DBG("MatrizInicial", mat)
+
+  for(i in 1:NROW(mat)){
+    mat <- procesarUna(mat, i)
+  }
+  return(mat)
+}
+
+mTriangulada <- triangular(MTest)
+mSolucion <- resolverMatriz(mTriangulada)
+#XXX: No me sirve con matrices de mas filas qe columnas, arreglar eso
 ```
